@@ -55,17 +55,13 @@ CREATE TABLE categories (
 );
 
 CREATE TABLE statistiques (
-  statistiques_id INT AUTO_INCREMENT,
+  statistique_id INT AUTO_INCREMENT,
   date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
-  favorites
-  user_id INT,
-  resource_id INT
-);
+  video_popular INT,
+  photo popular INT,
+  video_save INT,
+  photo_save INT,
+  video_favori INT, 
+  photo_favori INT
 
-
-
-CREATE TABLE favorites (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  resource_id INT
 );
