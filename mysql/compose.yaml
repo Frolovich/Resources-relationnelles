@@ -6,15 +6,15 @@
 # IMPORTANT: Under Windows, it is VERY important to install a WSL 2 Distro and enable IT
 #            See https://learn.microsoft.com/fr-fr/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
 
-name: java_banque_mysql
+name: java_source_mysql
 services:
   # https://hub.docker.com/_/mysql
-  mysql_banque:
+  mysql_source:
     image: mysql:8.2.0
     restart: unless-stopped
     env_file: ./.env
-    container_name: mysql.db.banque
-    hostname: mysql.db.banque
+    container_name: mysql.db.source
+    hostname: mysql.db.source
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -29,14 +29,14 @@ services:
     # one volume=volume: where to keep datas. It is a directory
     volumes:
       - type: bind
-        source: ./banque_mysql_docker.sql
+        source: ./source_mysql_docker.sql
         target: /docker-entrypoint-initdb.d/setup.sql
         read_only: true
       - type: volume
-        source: vol_mysql_banque
+        source: vol_mysql_source
         target: /var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysql", "-h", "localhost", "-P${DB_DOCKER_PORT}", "-u${DB_USER}", "-p${DB_USER_PASSWORD}", "-e", "SELECT 1 FROM banque.utilisateur;"]
+      test: ["CMD", "mysql", "-h", "localhost", "-P${DB_DOCKER_PORT}", "-u${DB_USER}", "-p${DB_USER_PASSWORD}", "-e", "SELECT 1 FROM source.utilisateur;"]
 #    test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD --port=${DB_DOCKER_PORT}
       start_period: 15s
       interval: 10s
@@ -46,13 +46,13 @@ services:
   # Web client for the data base
   # 10x lighter than PhpMyAdmin, and works for almost all Data Base
   # https://hub.docker.com/r/shyim/adminerevo
-  adminer_revo_banque:
+  adminer_revo_source:
     image: ghcr.io/shyim/adminerevo:latest
-    container_name: adminer.revo.banque
-    hostname: adminer.revo.banque
+    container_name: adminer.revo.source
+    hostname: adminer.revo.source
 
     depends_on:
-      mysql_banque:
+      mysql_source:
         condition: service_healthy
 
     restart: unless-stopped
@@ -65,10 +65,10 @@ services:
       ADMINER_DEFAULT_USER: ${DB_USER}
       ADMINER_DEFAULT_PASSWORD: ${DB_USER_PASSWORD}
       ADMINER_DEFAULT_DB: ${DB_DATABASE}
-      ADMINER_DEFAULT_SERVER: mysql.db.banque
+      ADMINER_DEFAULT_SERVER: mysql.db.source
 
 volumes:
-  vol_mysql_banque:
+  vol_mysql_source:
 
 #
 # Run all  : docker-compose up --build
@@ -78,19 +78,19 @@ volumes:
 
 
 # https://hub.docker.com/_/phpmyadmin
-#  phpmyadmin_banque:
+#  phpmyadmin_source:
 #    image: phpmyadmin:latest
 #    depends_on:
-#      - mysql_banque
-#    container_name: phpmyadmin_banque
+#      - mysql_source
+#    container_name: phpmyadmin_source
 #    env_file: ./.env
 #    links:
-#      - mysql_banque
+#      - mysql_source
 #    restart: unless-stopped
 #    ports:
 #      - $PMA_LOCAL_PORT:$PMA_DOCKER_PORT
 #    environment:
-#      - PMA_HOST=mysql_banque
+#      - PMA_HOST=mysql_source
 #      - PMA_PORT=$DB_DOCKER_PORT
 #      - PMA_USER=root
 #      - PMA_PASSWORD=$DB_ROOT_PASSWORD
