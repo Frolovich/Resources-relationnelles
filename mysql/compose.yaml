@@ -6,15 +6,15 @@
 # IMPORTANT: Under Windows, it is VERY important to install a WSL 2 Distro and enable IT
 #            See https://learn.microsoft.com/fr-fr/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
 
-name: java_source_mysql
+name: ressource_mysql
 services:
   # https://hub.docker.com/_/mysql
-  mysql_source:
+  mysql_ressource:
     image: mysql:8.2.0
     restart: unless-stopped
     env_file: ./.env
-    container_name: mysql.db.source
-    hostname: mysql.db.source
+    container_name: mysql.db.ressource
+    hostname: mysql.db.ressource
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -29,14 +29,14 @@ services:
     # one volume=volume: where to keep datas. It is a directory
     volumes:
       - type: bind
-        source: ./source_mysql_docker.sql
+        source: ./mysql_docker.sql
         target: /docker-entrypoint-initdb.d/setup.sql
         read_only: true
       - type: volume
-        source: vol_mysql_source
+        source: vol_mysql_ressource
         target: /var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysql", "-h", "localhost", "-P${DB_DOCKER_PORT}", "-u${DB_USER}", "-p${DB_USER_PASSWORD}", "-e", "SELECT 1 FROM source.utilisateur;"]
+      test: ["CMD", "mysql", "-h", "localhost", "-P${DB_DOCKER_PORT}", "-u${DB_USER}", "-p${DB_USER_PASSWORD}", "-e", "SELECT 1 FROM ressource.users;"]
 #    test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD --port=${DB_DOCKER_PORT}
       start_period: 15s
       interval: 10s
@@ -46,13 +46,13 @@ services:
   # Web client for the data base
   # 10x lighter than PhpMyAdmin, and works for almost all Data Base
   # https://hub.docker.com/r/shyim/adminerevo
-  adminer_revo_source:
+  adminer_revo_ressource:
     image: ghcr.io/shyim/adminerevo:latest
-    container_name: adminer.revo.source
-    hostname: adminer.revo.source
+    container_name: adminer.revo.ressource
+    hostname: adminer.revo.ressource
 
     depends_on:
-      mysql_source:
+      mysql_ressource:
         condition: service_healthy
 
     restart: unless-stopped
@@ -65,13 +65,13 @@ services:
       ADMINER_DEFAULT_USER: ${DB_USER}
       ADMINER_DEFAULT_PASSWORD: ${DB_USER_PASSWORD}
       ADMINER_DEFAULT_DB: ${DB_DATABASE}
-      ADMINER_DEFAULT_SERVER: mysql.db.source
+      ADMINER_DEFAULT_SERVER: mysql.db.ressource
 
 volumes:
-  vol_mysql_source:
+  vol_mysql_ressource:
 
 #
-# Run all  : docker-compose up --build
+# Run all  : docker compose up --build
 # Stop all : docker-compose down
 # Stop all and delte all img : docker-compose down --rmi all
 #
