@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./styles/home.css";
 
 export default function Home() {
   const [language, setLanguage] = useState("fr");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/home")
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(err => console.log(err));
+  }, []);
+
 
   const texts = {
     fr: {
