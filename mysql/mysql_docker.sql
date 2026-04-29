@@ -20,7 +20,10 @@ CREATE TABLE users (
 -- Dumping data for table `utilisateur`
 --
 INSERT INTO users (name, surname, email, password) VALUES ('Johny', 'Jein', 'jhony@mail.com', '123456');
-
+ALTER TABLE users 
+ADD nickname VARCHAR(100) NULL,
+ADD city VARCHAR(100) NULL,
+ADD birthdate DATE NULL;
 -- -----------------------------------------------------
 -- Table `categories`
 -- -----------------------------------------------------

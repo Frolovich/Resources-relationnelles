@@ -1,8 +1,20 @@
- import React, { useState } from "react";
+import React, { useState } from "react";
 import "./styles/signup.css";
 
 export default function Signup() {
   const [language, setLanguage] = useState("fr");
+
+
+  const [formData, setFormData] = useState({
+  firstName: "",
+  lastName: "",
+  nickname: "",
+  email: "",
+  city: "",
+  birthdate: "",
+  password: "",
+  confirmPassword: "",
+});
 
   const texts = {
     fr: {
@@ -39,6 +51,33 @@ export default function Signup() {
     },
   };
 
+  const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    console.log(data);
+
+    alert("Compte créé avec succès !");
+  } catch (error) {
+    console.error("Erreur:", error);
+  }
+};
+
   return (
     <div className="signup-page">
       {/* NAVBAR */}
@@ -70,20 +109,63 @@ export default function Signup() {
         </div>
 
         {/* FORM */}
-        <form className="signup-form">
-          <input type="text" placeholder={texts[language].firstName} />
-          <input type="text" placeholder={texts[language].lastName} />
-          <input type="text" placeholder={texts[language].nickname} />
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="firstName"
+            placeholder={texts[language].firstName}
+            value={formData.firstName}
+            onChange={handleChange}
+          />
+          <input
+            type="text"
+            name="lastName"
+            placeholder={texts[language].lastName}
+            value={formData.lastName}
+            onChange={handleChange}
+           />
+          <input
+            type="text"
+            name="nickname"
+            placeholder={texts[language].nickname}
+            value={formData.nickname}
+            onChange={handleChange}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder={texts[language].email}
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-          <input type="email" placeholder={texts[language].email} />
-          <input type="text" placeholder={texts[language].city} />
+          <input
+            type="text"
+            name="city"
+            placeholder={texts[language].city}
+            value={formData.city}
+            onChange={handleChange}
+          />
+          <input
+            type="date"
+            name="birthdate"
+            value={formData.birthdate}
+            onChange={handleChange}
+          />
+           <input
+            type="password"
+            name="password"
+            placeholder={texts[language].password}
+            value={formData.password}
+            onChange={handleChange}
+          />
 
-          <input type="date" />
-
-          <input type="password" placeholder={texts[language].password} />
           <input
             type="password"
+            name="confirmPassword"
             placeholder={texts[language].confirmPassword}
+            value={formData.confirmPassword}
+            onChange={handleChange}
           />
 
           <button type="submit">{texts[language].submit}</button>
