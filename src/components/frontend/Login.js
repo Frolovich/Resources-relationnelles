@@ -8,26 +8,26 @@ export default function Login() {
     fr: {
       title: "(Re)Sources Relationnelles",
       home: "Accueil",
-      signup: "S'inscrire",
+      register: "S'inscrire",
       subtitle: "Connectez-vous à votre compte.",
       formTitle: "Se connecter",
       email: "Email",
       password: "Mot de passe",
       submit: "Se connecter",
       noAccount: "Vous n'avez pas de compte ?",
-      signupLink: "S'inscrire",
+      registerLink: "S'inscrire",
     },
     en: {
       title: "(Re)Sources Relationnelles",
       home: "Home",
-      signup: "Sign up",
+      register: "Sign up",
       subtitle: "Log in to your account.",
       formTitle: "Log in",
       email: "Email",
       password: "Password",
       submit: "Log in",
       noAccount: "Don't have an account?",
-      signupLink: "Sign up",
+      registerLink: "Sign up",
     },
   };
 
@@ -40,7 +40,7 @@ export default function Login() {
 
         <div className="nav-buttons">
           <a href="/">{texts[language].home}</a>
-          <a href="/signup">{texts[language].signup}</a>
+          <a href="/register">{texts[language].register}</a>
 
           <div
             className={`switch ${language === "en" ? "active" : ""}`}
@@ -77,12 +77,12 @@ export default function Login() {
         </button>
       </form>
 
-      {/* LINK TO SIGNUP */}
+      {/* LINK TO register */}
       <div className="login-link">
         <p>
           {texts[language].noAccount}{" "}
-          <a href="/signup">
-            {texts[language].signupLink}
+          <a href="/register">
+            {texts[language].registerLink}
           </a>
         </p>
       </div>
