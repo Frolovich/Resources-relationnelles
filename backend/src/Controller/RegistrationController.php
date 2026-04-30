@@ -32,6 +32,22 @@ class RegistrationController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        // Verify reCAPTCHA token
+        $captchaToken = $data['captchaToken'] ?? null;
+        if (!$captchaToken) {
+            return $this->json(['error' => 'CAPTCHA token is missing.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $recaptchaSecret = $_ENV['RECAPTCHA_SECRET'] ?? '';
+        $recaptchaResponse = file_get_contents(
+            'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($recaptchaSecret) . '&response=' . urlencode($captchaToken)
+        );
+        $recaptchaData = json_decode($recaptchaResponse, true);
+
+        if (!$recaptchaData['success']) {
+            return $this->json(['error' => 'CAPTCHA validation failed. Please try again.'], Response::HTTP_BAD_REQUEST);
+        }
+
         // Check if user already exists
         if ($userRepository->findOneBy(['email' => $data['email']])) {
             return $this->json([

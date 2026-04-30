@@ -444,7 +444,7 @@ export default function Signup() {
           {/* reCAPTCHA */}
           <div className="form-group captcha-group">
             <ReCAPTCHA
-              sitekey="YOUR_RECAPTCHA_SITE_KEY_HERE"
+              sitekey="6LemC9IsAAAAAC3piDjHPnvZ2mUGkxiBv2bxGupe"
               onChange={(token) => setCaptchaToken(token)}
               onExpired={() => setCaptchaToken(null)}
             />
