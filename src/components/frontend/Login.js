@@ -4,70 +4,90 @@ import "./styles/login.css";
 
 export default function Login() {
   const [language, setLanguage] = useState("fr");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [identifier, setIdentifier] = useState(""); // email ou pseudo
+  const [password, setPassword]     = useState("");
+  const [error, setError]           = useState("");
+  const [loading, setLoading]       = useState(false);
 
-  const texts = {
+  const t = {
     fr: {
-      title: "(Re)Sources Relationnelles",
-      home: "Accueil",
-      register: "S'inscrire",
-      subtitle: "Connectez-vous à votre compte.",
-      formTitle: "Se connecter",
-      identifier: "Email ou pseudo",
-      password: "Mot de passe",
-      submit: "Se connecter",
-      noAccount: "Vous n'avez pas de compte ?",
-      registerLink: "S'inscrire",
-      forgotPassword: "Mot de passe oublié ?",
-      errorInvalid: "Identifiant ou mot de passe incorrect.",
-      errorServer: "Erreur de connexion au serveur.",
-      errorEmpty: "Veuillez remplir tous les champs.",
+      title:         "(Re)Sources Relationnelles",
+      home:          "Accueil",
+      register:      "S'inscrire",
+      subtitle:      "Connectez-vous à votre compte.",
+      formTitle:     "Se connecter",
+      identifier:    "Email ou pseudo",
+      password:      "Mot de passe",
+      submit:        "Se connecter",
+      noAccount:     "Vous n'avez pas de compte ?",
+      registerLink:  "S'inscrire",
+      forgotPassword:"Mot de passe oublié ?",
+      errorInvalid:  "Identifiant ou mot de passe incorrect.",
+      errorServer:   "Erreur de connexion au serveur.",
+      errorEmpty:    "Veuillez remplir tous les champs.",
     },
     en: {
-      title: "(Re)Sources Relationnelles",
-      home: "Home",
-      register: "Sign up",
-      subtitle: "Log in to your account.",
-      formTitle: "Log in",
-      identifier: "Email or username",
-      password: "Password",
-      submit: "Log in",
-      noAccount: "Don't have an account?",
-      registerLink: "Sign up",
-      forgotPassword: "Forgot password?",
-      errorInvalid: "Invalid identifier or password.",
-      errorServer: "Server connection error.",
-      errorEmpty: "Please fill in all fields.",
+      title:         "(Re)Sources Relationnelles",
+      home:          "Home",
+      register:      "Sign up",
+      subtitle:      "Log in to your account.",
+      formTitle:     "Log in",
+      identifier:    "Email or username",
+      password:      "Password",
+      submit:        "Log in",
+      noAccount:     "Don't have an account?",
+      registerLink:  "Sign up",
+      forgotPassword:"Forgot password?",
+      errorInvalid:  "Invalid identifier or password.",
+      errorServer:   "Server connection error.",
+      errorEmpty:    "Please fill in all fields.",
     },
-  };
+  }[language];
 
-  const t = texts[language];
+  // Détermine si l'identifiant est un email ou un pseudo
+  const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
+    if (!identifier.trim() || !password) {
       setError(t.errorEmpty);
       return;
     }
 
     setLoading(true);
     try {
+      let emailToUse = identifier.trim();
+
+      // Si c'est un pseudo → résoudre l'email via /api/resolve-email
+      if (!isEmail(emailToUse)) {
+        const resolveRes = await fetch(
+          `http://localhost:8000/api/resolve-email?nickname=${encodeURIComponent(emailToUse)}`
+        );
+        if (!resolveRes.ok) {
+          setError(t.errorInvalid);
+          setLoading(false);
+          return;
+        }
+        const resolveData = await resolveRes.json();
+        emailToUse = resolveData.email;
+      }
+
+      // Connexion avec l'email
       const response = await fetch("http://localhost:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: emailToUse, password }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.token) {
         localStorage.setItem("token", data.token);
-        window.location.href = "/";
+        // Rediriger vers la page précédente ou account
+        const redirect = new URLSearchParams(window.location.search).get("redirect") || "/account";
+        window.location.href = redirect;
       } else {
         setError(t.errorInvalid);
       }
@@ -104,30 +124,33 @@ export default function Login() {
           <p>{t.subtitle}</p>
         </div>
 
-        {/* FORM */}
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
           {error && <div className="login-error">{error}</div>}
 
           <div className="form-group">
-            <label>{t.identifier}</label>
+            <label htmlFor="identifier">{t.identifier}</label>
             <input
+              id="identifier"
               type="text"
               placeholder={t.identifier}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={identifier}
+              onChange={(e) => { setIdentifier(e.target.value); setError(""); }}
               className={error ? "error" : ""}
               autoComplete="username"
+              autoFocus
             />
           </div>
 
           <div className="form-group">
-            <label>{t.password}</label>
+            <label htmlFor="password">{t.password}</label>
             <input
+              id="password"
               type="password"
               placeholder={t.password}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
               className={error ? "error" : ""}
+              autoComplete="current-password"
             />
           </div>
 
@@ -141,9 +164,7 @@ export default function Login() {
         </form>
 
         <div className="login-link">
-          <p>
-            {t.noAccount} <a href="/register">{t.registerLink}</a>
-          </p>
+          <p>{t.noAccount} <a href="/register">{t.registerLink}</a></p>
         </div>
       </div>
 
