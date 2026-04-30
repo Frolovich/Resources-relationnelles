@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./styles/common.css";
 import "./styles/login.css";
 
 export default function Login() {
@@ -15,14 +16,15 @@ export default function Login() {
       register: "S'inscrire",
       subtitle: "Connectez-vous à votre compte.",
       formTitle: "Se connecter",
-      email: "Email",
+      identifier: "Email ou pseudo",
       password: "Mot de passe",
       submit: "Se connecter",
       noAccount: "Vous n'avez pas de compte ?",
       registerLink: "S'inscrire",
       forgotPassword: "Mot de passe oublié ?",
-      errorInvalid: "Email ou mot de passe incorrect.",
+      errorInvalid: "Identifiant ou mot de passe incorrect.",
       errorServer: "Erreur de connexion au serveur.",
+      errorEmpty: "Veuillez remplir tous les champs.",
     },
     en: {
       title: "(Re)Sources Relationnelles",
@@ -30,14 +32,15 @@ export default function Login() {
       register: "Sign up",
       subtitle: "Log in to your account.",
       formTitle: "Log in",
-      email: "Email",
+      identifier: "Email or username",
       password: "Password",
       submit: "Log in",
       noAccount: "Don't have an account?",
       registerLink: "Sign up",
       forgotPassword: "Forgot password?",
-      errorInvalid: "Invalid email or password.",
+      errorInvalid: "Invalid identifier or password.",
       errorServer: "Server connection error.",
+      errorEmpty: "Please fill in all fields.",
     },
   };
 
@@ -48,7 +51,7 @@ export default function Login() {
     setError("");
 
     if (!email || !password) {
-      setError(language === "fr" ? "Veuillez remplir tous les champs." : "Please fill in all fields.");
+      setError(t.errorEmpty);
       return;
     }
 
@@ -106,13 +109,14 @@ export default function Login() {
           {error && <div className="login-error">{error}</div>}
 
           <div className="form-group">
-            <label>{t.email}</label>
+            <label>{t.identifier}</label>
             <input
-              type="email"
-              placeholder={t.email}
+              type="text"
+              placeholder={t.identifier}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={error ? "error" : ""}
+              autoComplete="username"
             />
           </div>
 

@@ -170,7 +170,7 @@ export default function Home() {
         {/* VIDEOS */}
         <div className="section-block">
           <div className="section-block-header">
-            <div className="section-title">🎥 {t.videos}</div>
+            <div className="section-title">{t.videos}</div>
             <FilterDropdown
               language={language}
               filters={videoFilters}
@@ -197,7 +197,7 @@ export default function Home() {
         {/* PHOTOS */}
         <div className="section-block">
           <div className="section-block-header">
-            <div className="section-title">🖼️ {t.photos}</div>
+            <div className="section-title">{t.photos}</div>
             <FilterDropdown
               language={language}
               filters={photoFilters}

@@ -1,19 +1,5 @@
 /* ========================
-   BASE
-   ======================== */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background: #0f172a;
-  font-family: Arial, sans-serif;
-}
-
-/* ========================
-   PAGE
+   LOGIN PAGE
    ======================== */
 .login-page {
   min-height: 100vh;
@@ -22,70 +8,6 @@ html, body {
   background: #0f172a;
 }
 
-/* ========================
-   NAVBAR
-   ======================== */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  padding: 15px 30px;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  font-weight: bold;
-  font-size: 18px;
-  color: white;
-}
-
-.nav-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.nav-buttons a {
-  text-decoration: none;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: 0.2s;
-}
-
-.nav-buttons a:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.switch {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.15);
-  padding: 5px 10px;
-  border-radius: 20px;
-  transition: 0.2s;
-}
-
-.switch:hover {
-  background: rgba(255,255,255,0.25);
-}
-
-.circle {
-  width: 14px;
-  height: 14px;
-  background: white;
-  border-radius: 50%;
-}
-
-/* ========================
-   CONTENT
-   ======================== */
 .login-content {
   flex: 1;
   display: flex;
@@ -95,16 +17,13 @@ html, body {
   padding: 40px 20px;
 }
 
-/* ========================
-   HERO
-   ======================== */
 .login-hero {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
 .login-hero h2 {
-  font-size: 28px;
+  font-size: 26px;
   color: #f1f5f9;
   margin: 0 0 8px;
 }
@@ -116,11 +35,11 @@ html, body {
 }
 
 /* ========================
-   FORM
+   FORM CARD
    ======================== */
 .login-form {
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -130,13 +49,7 @@ html, body {
   border: 1px solid #334155;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group label {
+.login-form .form-group label {
   font-size: 13px;
   color: #94a3b8;
   font-weight: 600;
@@ -150,7 +63,8 @@ html, body {
   color: white;
   font-size: 14px;
   outline: none;
-  transition: 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
 }
 
 .login-form input::placeholder {
@@ -166,9 +80,6 @@ html, body {
   border-color: #ef4444;
 }
 
-/* ========================
-   ERROR
-   ======================== */
 .login-error {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid #ef4444;
@@ -179,9 +90,6 @@ html, body {
   text-align: center;
 }
 
-/* ========================
-   FORGOT PASSWORD
-   ======================== */
 .login-forgot {
   text-align: right;
   margin-top: -8px;
@@ -197,10 +105,7 @@ html, body {
   text-decoration: underline;
 }
 
-/* ========================
-   SUBMIT BUTTON
-   ======================== */
-.login-form button {
+.login-form button[type="submit"] {
   padding: 12px;
   background: #2563eb;
   color: white;
@@ -209,22 +114,20 @@ html, body {
   cursor: pointer;
   font-weight: bold;
   font-size: 15px;
-  transition: 0.2s;
+  transition: background 0.2s;
+  width: 100%;
   margin-top: 4px;
 }
 
-.login-form button:hover {
+.login-form button[type="submit"]:hover {
   background: #1e40af;
 }
 
-.login-form button:disabled {
+.login-form button[type="submit"]:disabled {
   background: #475569;
   cursor: not-allowed;
 }
 
-/* ========================
-   REGISTER LINK
-   ======================== */
 .login-link {
   text-align: center;
   margin-top: 20px;
@@ -243,37 +146,25 @@ html, body {
 }
 
 /* ========================
-   FOOTER
+   RESPONSIVE
    ======================== */
-.footer {
-  padding: 30px 40px;
-  background: #1e293b;
-  border-top: 1px solid #334155;
-}
+@media (max-width: 480px) {
+  .login-content {
+    padding: 24px 16px;
+    justify-content: flex-start;
+    padding-top: 32px;
+  }
 
-.footer-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 40px;
-}
+  .login-form {
+    padding: 24px 20px;
+    border-radius: 12px;
+  }
 
-.footer-column {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  .login-hero h2 {
+    font-size: 22px;
+  }
 
-.footer-column button {
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-  color: #94a3b8;
-  padding: 0;
-}
-
-.footer-column button:hover {
-  color: white;
-  text-decoration: underline;
+  .login-hero p {
+    font-size: 13px;
+  }
 }

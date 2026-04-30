@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
+import "./styles/common.css";
 import "./styles/signup.css";
 
 // Composant tooltip réutilisable
@@ -35,6 +36,7 @@ export default function Signup() {
   const [captchaToken, setCaptchaToken] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -154,60 +156,7 @@ export default function Signup() {
     },
   ];
 
-  const checkboxFields = [
-    {
-      name: "termsAccepted",
-      required: true,
-      fr: "J'accepte les",
-      en: "I accept the",
-      linkFr: "Conditions d'utilisation",
-      linkEn: "Terms of Service",
-      href: "/terms",
-      tooltip: {
-        fr: "Vous devez accepter nos conditions d'utilisation pour créer un compte. Cliquez sur le lien pour les lire.",
-        en: "You must accept our terms of service to create an account. Click the link to read them.",
-      },
-    },
-    {
-      name: "privacyPolicyAccepted",
-      required: true,
-      fr: "J'accepte la",
-      en: "I accept the",
-      linkFr: "Politique de confidentialité",
-      linkEn: "Privacy Policy",
-      href: "/privacy",
-      tooltip: {
-        fr: "Vous devez accepter notre politique de confidentialité. Elle décrit comment nous utilisons vos données.",
-        en: "You must accept our privacy policy. It describes how we use your data.",
-      },
-    },
-    {
-      name: "cookiesAccepted",
-      required: false,
-      fr: "J'accepte l'utilisation des",
-      en: "I accept the use of",
-      linkFr: "cookies",
-      linkEn: "cookies",
-      href: "/cookies",
-      tooltip: {
-        fr: "Les cookies nous permettent d'améliorer votre expérience sur le site.",
-        en: "Cookies allow us to improve your experience on the site.",
-      },
-    },
-    {
-      name: "marketingConsent",
-      required: false,
-      fr: "J'accepte de recevoir des communications marketing",
-      en: "I agree to receive marketing communications",
-      linkFr: null,
-      linkEn: null,
-      href: null,
-      tooltip: {
-        fr: "Cochez cette case si vous souhaitez recevoir nos newsletters et offres promotionnelles.",
-        en: "Check this box if you wish to receive our newsletters and promotional offers.",
-      },
-    },
-  ];
+  // Pas utilisé — remplacé par le bloc RGPD unifié ci-dessous
 
   const ui = {
     fr: {
@@ -264,7 +213,12 @@ export default function Signup() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    // Un seul checkbox pour terms + privacy
+    if (name === "termsAccepted") {
+      setFormData({ ...formData, termsAccepted: checked, privacyPolicyAccepted: checked });
+    } else {
+      setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    }
     if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
@@ -299,6 +253,7 @@ export default function Signup() {
     e.preventDefault();
     if (!validateForm()) return;
     setLoading(true);
+    setSubmitError("");
     try {
       const response = await fetch("http://localhost:8000/api/register", {
         method: "POST",
@@ -320,14 +275,27 @@ export default function Signup() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert(t.successMsg);
-        window.location.href = "/login";
+        // Connexion automatique après inscription
+        const loginRes = await fetch("http://localhost:8000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email, password: formData.password }),
+        });
+        const loginData = await loginRes.json();
+        if (loginData.token) {
+          localStorage.setItem("token", loginData.token);
+        }
+        window.location.href = "/account";
       } else {
-        if (data.error) alert(data.error);
-        else if (data.details) setErrors(data.details);
+        if (data.error) {
+          setSubmitError(data.error);
+        } else if (data.details) {
+          setErrors(data.details);
+          setSubmitError(language === "fr" ? "Veuillez corriger les erreurs ci-dessous." : "Please fix the errors below.");
+        }
       }
     } catch {
-      alert(t.serverError);
+      setSubmitError(t.serverError);
     } finally {
       setLoading(false);
     }
@@ -385,6 +353,10 @@ export default function Signup() {
 
         <form className="signup-form" onSubmit={handleSubmit}>
 
+          {submitError && (
+            <div className="alert-error">{submitError}</div>
+          )}
+
           {/* CHAMPS TEXTE */}
           {fields.map((field) => (
             <div className="form-group" key={field.name}>
@@ -411,35 +383,67 @@ export default function Signup() {
             </div>
           ))}
 
-          {/* CHECKBOXES RGPD */}
-          {checkboxFields.map((field) => (
-            <div className="form-group checkbox-group" key={field.name}>
-              <label className={errors[field.name] ? "error" : ""}>
-                <input
-                  type="checkbox"
-                  name={field.name}
-                  checked={formData[field.name]}
-                  onChange={handleChange}
-                />
-                <span>
-                  {language === "fr" ? field.fr : field.en}
-                  {field.href && (
-                    <>
-                      {" "}
-                      <a href={field.href} target="_blank" rel="noreferrer">
-                        {language === "fr" ? field.linkFr : field.linkEn}
-                      </a>
-                    </>
-                  )}
-                  {field.required && " *"}
-                </span>
-                <Tooltip text={language === "fr" ? field.tooltip.fr : field.tooltip.en} />
-              </label>
-              {errors[field.name] && (
-                <span className="error-text">{errors[field.name]}</span>
-              )}
+          {/* RGPD — bloc unifié */}
+          <div className="rgpd-block">
+            <div className="rgpd-title">
+              {language === "fr"
+                ? "Conditions & confidentialité *"
+                : "Terms & privacy *"}
+              <Tooltip text={language === "fr"
+                ? "Vous devez accepter les conditions et la politique de confidentialité pour créer un compte."
+                : "You must accept the terms and privacy policy to create an account."
+              } />
             </div>
-          ))}
+
+            <label className="rgpd-row">
+              <input
+                type="checkbox"
+                name="termsAccepted"
+                checked={formData.termsAccepted}
+                onChange={handleChange}
+              />
+              <span>
+                {language === "fr"
+                  ? <> <a href="/terms" target="_blank" rel="noreferrer">Conditions d'utilisation</a> et <a href="/privacy" target="_blank" rel="noreferrer">Politique de confidentialité</a></>
+                  : <> <a href="/terms" target="_blank" rel="noreferrer">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noreferrer">Privacy Policy</a></>
+                }
+              </span>
+            </label>
+            {(errors.termsAccepted || errors.privacyPolicyAccepted) && (
+              <span className="error-text">
+                {errors.termsAccepted || errors.privacyPolicyAccepted}
+              </span>
+            )}
+
+            <label className="rgpd-row optional">
+              <input
+                type="checkbox"
+                name="cookiesAccepted"
+                checked={formData.cookiesAccepted}
+                onChange={handleChange}
+              />
+              <span>
+                {language === "fr"
+                  ? <><a href="/cookies" target="_blank" rel="noreferrer">Cookies</a> (optionnel)</>
+                  : <><a href="/cookies" target="_blank" rel="noreferrer">Cookies</a> (optional)</>
+                }
+              </span>
+            </label>
+
+            <label className="rgpd-row optional">
+              <input
+                type="checkbox"
+                name="marketingConsent"
+                checked={formData.marketingConsent}
+                onChange={handleChange}
+              />
+              <span>
+                {language === "fr"
+                  ? "Communications marketing (optionnel)"
+                  : "Marketing communications (optional)"}
+              </span>
+            </label>
+          </div>
 
           {/* reCAPTCHA */}
           <div className="form-group captcha-group">

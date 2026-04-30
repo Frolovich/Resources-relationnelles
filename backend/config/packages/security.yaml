@@ -13,7 +13,6 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
-        # Endpoint for login — returns JWT token
         login:
             pattern: ^/api/login
             stateless: true
@@ -24,7 +23,6 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        # All other API routes — protected by JWT
         api:
             pattern: ^/api
             stateless: true
@@ -33,6 +31,7 @@ security:
     access_control:
         - { path: ^/api/login,    roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/me,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api,          roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
