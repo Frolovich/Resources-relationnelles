@@ -1,5 +1,8 @@
-CREATE DATABASE social_db;
-USE social_db;
+-- MySQL Workbench Forward Engineering
+
+-- -----------------------------------------------------
+-- Table `users`
+-- -----------------------------------------------------
 
 CREATE TABLE users (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,16 +16,28 @@ CREATE TABLE users (
   deleted_at DATETIME NULL
 );
 
-INSERT INTO users (name, surname, email, password)
-VALUES ('Johny', 'Jein', 'jhony@mail.com', '123456');
+--
+-- Dumping data for table `utilisateur`
+--
+INSERT INTO users (name, surname, email, password) VALUES ('Johny', 'Jein', 'jhony@mail.com', '123456');
+ALTER TABLE users 
+ADD nickname VARCHAR(100) NULL,
+ADD city VARCHAR(100) NULL,
+ADD birthdate DATE NULL;
+-- -----------------------------------------------------
+-- Table `categories`
+-- -----------------------------------------------------
 
 CREATE TABLE categories (
   category_id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100)
 );
 
-INSERT INTO categories (name)
-VALUES ('Video'), ('Photo');
+INSERT INTO categories (name) VALUES ('Video'), ('Photo');
+
+-- -----------------------------------------------------
+-- Table `resources`
+-- -----------------------------------------------------
 
 CREATE TABLE resources (
   resource_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,8 +59,11 @@ CREATE TABLE resources (
   FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
-INSERT INTO resources (user_id, category_id, description, content, type)
-VALUES (1, 1, 'My first video', 'video.mp4', 'video');
+INSERT INTO resources (user_id, category_id, description, content, type) VALUES (1, 1, 'My first video', 'video.mp4', 'video');
+
+-- -----------------------------------------------------
+-- Table `comments`
+-- -----------------------------------------------------
 
 CREATE TABLE comments (
   comment_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,8 +77,11 @@ CREATE TABLE comments (
   FOREIGN KEY (resource_id) REFERENCES resources(resource_id)
 );
 
-INSERT INTO comments (user_id, resource_id, content)
-VALUES (1, 1, 'Nice video!');
+INSERT INTO comments (user_id, resource_id, content) VALUES (1, 1, 'Nice video!');
+
+-- -----------------------------------------------------
+-- Table `statistiques`
+-- -----------------------------------------------------
 
 CREATE TABLE statistiques (
   statistique_id INT AUTO_INCREMENT PRIMARY KEY,
